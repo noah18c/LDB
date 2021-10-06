@@ -5,15 +5,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class App extends SQLException {
+public class App {
     public static void main(String[] args) throws SQLException{
         String url = "jdbc:mysql://localhost:3306/ldb";
         String user = "root";
         String password = "Aftershave1808";
 
-        /*
-        IntroScreen intro = new IntroScreen();
-        intro.run();
+
+
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -25,9 +24,7 @@ public class App extends SQLException {
 
         try {
             con = DriverManager.getConnection(url, user, password);
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("Select pizza_name From pizza");
-            con.close();
+
         } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
@@ -35,9 +32,14 @@ public class App extends SQLException {
 
         }
 
+        IntroScreen intro = new IntroScreen(con);
+        intro.run();
 
 
 
+
+
+        /*
         String query = "SELECT * FROM pizza";
         ResultSet rs = null;
 
