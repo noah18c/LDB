@@ -2,9 +2,14 @@ import java.sql.Connection;
 
 public class Customer {
     private String firstName, lastName;
-    private int customerID, phoneNumber, streetNumber;
-    private char numberAdd;
-    private String postalCode, streetName;
+    private int phoneNumber, addressId;
+
+    public Customer(String firstName, String lastName, int phoneNumber, int addressId) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.addressId = addressId;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -30,35 +35,7 @@ public class Customer {
         this.phoneNumber = phoneNumber;
     }
 
-    public int getStreetNumber() {
-        return streetNumber;
-    }
+    public int getAddressId() { return addressId;}
 
-    public void setStreetNumber(int streetNumber) {
-        this.streetNumber = streetNumber;
-    }
-
-    public char getNumberAdd() {
-        return numberAdd;
-    }
-
-    public void setNumberAdd(char numberAdd) {
-        this.numberAdd = numberAdd;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    public String getStreetName() {
-        return streetName;
-    }
-
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
-    }
+    public void setAddressId() {this.addressId = addressId;}
 }

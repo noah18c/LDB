@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class IntroScreen {
@@ -22,22 +23,64 @@ public class IntroScreen {
         //printMenu();
        // choices();
         customerInfo();
+        orderCreation();
+    }
+
+    private void orderCreation() {
+
     }
 
     private void customerInfo() {
         System.out.println("Please enter customer details: ");
-        String firstName, lastName;
+        String firstName, lastName, streetName, postalCode;
+        int phoneNumber, houseNumber;
 
         Scanner s = new Scanner(System.in);
         System.out.print("First Name: ");
         firstName = s.nextLine();
 
-        System.out.print("\nLast Name: ");
+        System.out.print("Last Name: ");
         lastName = s.nextLine();
 
+        // try to find customer
+        CustomerDataMapper customerMapper = new CustomerDataMapper(con);
+        AddressDataMapper addressMapper = new AddressDataMapper(con);
+
+        Optional<Customer> opt = customerMapper.find(firstName, lastName);
+        Customer cust;
+        Address address = null;
+
+        if (opt.isPresent()) {
+            System.out.println("We found your details in the system:");
+            cust = opt.get();
+            Optional<Address> optAdr = addressMapper.find(cust.getAddressId());
+            if (optAdr.isPresent())
+                address = optAdr.get();
+            System.out.println("Phone number: " + cust.getPhoneNumber());
+            System.out.println("Street name: " + address.getStreetName());
+            System.out.println("House number: " + address.getHouseNumber());
+            System.out.println("Postal code: " + address.getPostalCode());
+        }
+        else {
+            System.out.print("Phone number: ");
+            phoneNumber = s.nextInt();
+            System.out.print("Street name: ");
+            s.nextLine();
+            streetName = s.nextLine();
+
+            System.out.print("House number: ");
+            houseNumber = s.nextInt();
+            System.out.print("Postal code: ");
+            s.nextLine();
+            postalCode = s.nextLine();
 
 
-
+            address = new Address(postalCode, streetName, houseNumber);
+            int addressId = addressMapper.insert(address);
+            cust = new Customer(firstName, lastName, phoneNumber, addressId);
+            customerMapper.insert(cust);
+        }
+        // if no existing customer, create new one
     }
 
     private void choices() {
