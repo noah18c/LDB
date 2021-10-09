@@ -1,10 +1,17 @@
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Customer {
+    private Connection con;
     private String firstName, lastName;
     private int customerID, phoneNumber, streetNumber;
-    private char numberAdd;
-    private String postalCode, streetName;
+    private String postalCode, streetName, numberAdd;
+
+    public Customer(Connection con){
+        this.con = con;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -20,6 +27,27 @@ public class Customer {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String nameToString(){
+        return firstName+" "+lastName;
+    }
+
+    public boolean recognizeCustomer() {
+        String query = "SELECT first_name, last_name FROM customer WHERE first_name = '"+this.getFirstName()+"' AND last_name = '"+this.getLastName()+"';";
+        ResultSet rs = null;
+
+        boolean isKnown = false;
+        try (Statement stmt = con.createStatement()) {
+            rs = stmt.executeQuery(query);
+
+            if(rs.equals(null)){
+                isKnown = true;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return isKnown;
     }
 
     public int getPhoneNumber() {
@@ -38,11 +66,11 @@ public class Customer {
         this.streetNumber = streetNumber;
     }
 
-    public char getNumberAdd() {
+    public String getNumberAdd() {
         return numberAdd;
     }
 
-    public void setNumberAdd(char numberAdd) {
+    public void setNumberAdd(String numberAdd) {
         this.numberAdd = numberAdd;
     }
 

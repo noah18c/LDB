@@ -11,9 +11,6 @@ public class App {
         String user = "root";
         String password = "Aftershave1808";
 
-
-
-
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {

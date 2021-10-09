@@ -1,13 +1,11 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class IntroScreen {
     private Connection con;
+
     public ArrayList<String> pizzas = new ArrayList<>();
     public ArrayList<String> drinks = new ArrayList<>();
     public ArrayList<String> desserts = new ArrayList<>();
@@ -16,29 +14,95 @@ public class IntroScreen {
         this.con = con;
     }
 
-
     public void run() {
         welcomeMessage();
-        //printMenu();
-       // choices();
+        printMenu();
+        choices();
         customerInfo();
     }
 
     private void customerInfo() {
-        System.out.println("Please enter customer details: ");
+        System.out.println("\nPlease enter customer details: ");
+
         String firstName, lastName;
+        Customer customer = new Customer(con);
 
         Scanner s = new Scanner(System.in);
-        System.out.print("First Name: ");
-        firstName = s.nextLine();
 
-        System.out.print("\nLast Name: ");
-        lastName = s.nextLine();
+        firstName = "";
+        while(firstName.isEmpty()){
+            System.out.print("First Name: ");
+            firstName = s.nextLine();
+            firstName.toLowerCase();
+            customer.setFirstName(firstName);
+        }
+        lastName = "";
+        while(lastName.isEmpty()){
+            System.out.print("Last Name: ");
+            lastName = s.nextLine();
+            lastName.toLowerCase();
+            customer.setLastName(lastName);
+        }
 
-
+        boolean exists = customer.recognizeCustomer();
+        if(exists){
+            System.out.println("Welcome back : "+customer.nameToString());
+        } else {
+            System.out.println("\nWe just need a little more info: ");
+            extraCustomerInfo(customer);
+        }
 
 
     }
+
+    private void extraCustomerInfo(Customer customer) {
+
+        String postalCode, streetName;
+        String numberAdd;
+        int phoneNumber, streetNumber;
+        Scanner s = new Scanner(System.in);
+
+
+        postalCode = "";
+        while(postalCode.isEmpty() || postalCode.length() < 6){
+            System.out.print("Postal Code: ");
+            postalCode = s.nextLine();
+            postalCode.toLowerCase();
+            customer.setPostalCode(postalCode);
+        }
+
+        streetName = "";
+        while(streetName.isEmpty()){
+            System.out.print("Street Name: ");
+            streetName = s.nextLine();
+            streetName.toLowerCase();
+            customer.setStreetName(streetName);
+        }
+
+
+
+        streetNumber = 0;
+        while(streetNumber <= 0){
+            System.out.print("Street Number: ");
+            if(s.hasNextInt()){
+                streetNumber = s.nextInt();
+                customer.setStreetNumber(streetNumber);
+            } else {
+                String dummy = s.next();
+                streetNumber = 0;
+                System.out.println("Please select an integer");
+            }
+        }
+
+        s.nextLine(); //consumed by previous nextInt();
+
+        System.out.print("Street Additive: ");
+        numberAdd = s.nextLine();
+        customer.setNumberAdd(numberAdd);
+
+        System.out.println("That's about it!");
+    }
+
 
     private void choices() {
         HashMap<Integer, String> itemsByNumber = new HashMap<>();
@@ -66,7 +130,11 @@ public class IntroScreen {
            } else {
                System.out.println("Please choose atleast one pizza...");
            }
+        }
 
+        if(choices.isEmpty()){
+            System.out.println("See you next time!");
+            System.exit(0);
         }
 
         System.out.println("Now you may add additional items. ");
@@ -79,10 +147,14 @@ public class IntroScreen {
             }
         }
 
+
+
         System.out.print("\nYour order: ");
         for (int choice : choices) {
             System.out.print(itemsByNumber.get(choice) + ", ");
         }
+
+
     }
 
 
@@ -122,17 +194,17 @@ public class IntroScreen {
 
             System.out.println("");
             for(int i = 0; i < pizzas.size() ; i++){
-                System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i));
+                System.out.println(counter++ + " " + pizzas.get(i)+" | €"+pizzaPrices.get(i));
             }
 
             System.out.println("");
             for(int i = 0; i < drinks.size() ; i++){
-                System.out.println(counter++ + " " + drinks.get(i)+" | "+drinkPrices.get(i));
+                System.out.println(counter++ + " " + drinks.get(i)+" | €"+drinkPrices.get(i));
             }
 
             System.out.println("");
             for(int i = 0; i < desserts.size() ; i++){
-                System.out.println(counter++ + " " + desserts.get(i)+" | "+dessertPrices.get(i));
+                System.out.println(counter++ + " " + desserts.get(i)+" | €"+dessertPrices.get(i));
             }
 
 
