@@ -68,15 +68,23 @@ public class IntroScreen {
 
     private void customerInfo() {
         System.out.println("\n\nPlease enter customer details: ");
-        String firstName, lastName, streetName, postalCode;
+        String firstName, lastName, streetName, postalCode, numberAdd;
         int phoneNumber, houseNumber;
 
         Scanner s = new Scanner(System.in);
-        System.out.print("First Name: ");
-        firstName = s.nextLine();
+        firstName = "";
+        while(firstName.isEmpty()){
+            System.out.print("First Name: ");
+            firstName = s.nextLine();
+            firstName.toLowerCase();
+        }
 
-        System.out.print("Last Name: ");
-        lastName = s.nextLine();
+        lastName = "";
+        while(lastName.isEmpty()){
+            System.out.print("Last Name: ");
+            lastName = s.nextLine();
+            lastName.toLowerCase();
+        }
 
         // try to find customer
         CustomerDataMapper customerMapper = new CustomerDataMapper(con);
@@ -97,17 +105,56 @@ public class IntroScreen {
             System.out.println("Postal code: " + address.getPostalCode());
         }
         else {
-            System.out.print("Phone number: ");
-            phoneNumber = s.nextInt();
-            System.out.print("Street name: ");
-            s.nextLine();
-            streetName = s.nextLine();
 
-            System.out.print("House number: ");
-            houseNumber = s.nextInt();
-            System.out.print("Postal code: ");
-            s.nextLine();
-            postalCode = s.nextLine();
+            phoneNumber = 0;
+            while(phoneNumber <= 600000000){
+                System.out.print("Phone Number: ");
+                if(s.hasNextInt()){
+                    phoneNumber = s.nextInt();
+                } else {
+                    String dummy = s.next();
+                    phoneNumber = 0;
+                    System.out.println("Please use only positive integers");
+                }
+                if(phoneNumber<=600000000){
+                    System.out.println("Please select a proper phone number");
+                }
+            }
+
+            s.nextLine(); //consumed by previous nextInt();
+
+            postalCode = "";
+            while(postalCode.isEmpty() || postalCode.length() < 6){
+                System.out.print("Postal Code: ");
+                postalCode = s.nextLine();
+                postalCode.toLowerCase();
+            }
+
+            streetName = "";
+            while(streetName.isEmpty()){
+                System.out.print("Street Name: ");
+                streetName = s.nextLine();
+                streetName.toLowerCase();
+            }
+
+            houseNumber = 0;
+            while(houseNumber <= 0){
+                System.out.print("House Number: ");
+                if(s.hasNextInt()){
+                    houseNumber = s.nextInt();
+                } else {
+                    String dummy = s.next();
+                    houseNumber = 0;
+                    System.out.println("Please select an integer");
+                }
+            }
+
+            s.nextLine(); //consumed by previous nextInt();
+
+            System.out.print("Street Additive: ");
+            numberAdd = s.nextLine();
+
+            System.out.println("That's about it!");
 
 
             address = new Address(postalCode, streetName, houseNumber);
