@@ -68,8 +68,9 @@ public class IntroScreen {
 
     private void customerInfo() {
         System.out.println("\n\nPlease enter customer details: ");
-        String firstName, lastName, streetName, postalCode, numberAdd;
+        String firstName, lastName, streetName, postalCode;
         int phoneNumber, houseNumber;
+        char streetAdd;
 
         Scanner s = new Scanner(System.in);
         firstName = "";
@@ -148,11 +149,6 @@ public class IntroScreen {
                     System.out.println("Please select an integer");
                 }
             }
-
-            s.nextLine(); //consumed by previous nextInt();
-
-            System.out.print("Street Additive: ");
-            numberAdd = s.nextLine();
 
             System.out.println("That's about it!");
 

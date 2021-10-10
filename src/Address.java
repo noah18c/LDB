@@ -2,11 +2,16 @@ public class Address {
     private String postalCode, streetName;
     private int houseNumber, addressId;
 
+
+
+
     public Address(String postalCode, String streetName, int houseNumber) {
         this.postalCode = postalCode;
         this.streetName = streetName;
         this.houseNumber = houseNumber;
     }
+
+
 
     public String getPostalCode() {
         return postalCode;
