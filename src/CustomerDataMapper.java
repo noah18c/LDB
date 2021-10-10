@@ -30,7 +30,7 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
     @Override
     public void insert(Customer customer) {
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO customer (first_name, last_name, phone_number, address_id) values (?, ?, ?, ?)");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO customer (first_name, last_name, phone_number, address_id, order_history) values (?, ?, ?, ?, 0)");
             stmt.setString(1, customer.getFirstName());
             stmt.setString(2, customer.getLastName());
             stmt.setInt(3, customer.getPhoneNumber());
@@ -47,4 +47,16 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
             System.out.println("Error in PK finding");
         }
     }
+
+    public void update(Customer customerToBeUpdated) {
+        try {
+            PreparedStatement pstmt = con.prepareStatement("UPDATE customer SET order_history = ? WHERE customer_id = ?;");
+            pstmt.setInt(1, customerToBeUpdated.getOrderHistory());
+            pstmt.setInt(2, customerToBeUpdated.getCustomerId());
+            pstmt.executeUpdate();
+        } catch (SQLException ex){
+            System.out.println("Customer update failed");
+        }
+    }
+
 }

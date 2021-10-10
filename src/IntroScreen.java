@@ -1,7 +1,5 @@
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
@@ -17,6 +15,10 @@ public class IntroScreen {
     ArrayList<String> drinkPrices;
     ArrayList<String> dessertPrices;
 
+    OrderDataMapper orderDataMapper;
+    CustomerDataMapper customerMapper;
+    AddressDataMapper addressMapper;
+
     ArrayList<Integer> choices;
     float totalPrice;
 
@@ -28,6 +30,9 @@ public class IntroScreen {
 
     public IntroScreen(Connection con){
         this.con = con;
+        orderDataMapper = new OrderDataMapper(con);
+        customerMapper = new CustomerDataMapper(con);
+        addressMapper = new AddressDataMapper(con);
     }
 
 
@@ -42,9 +47,13 @@ public class IntroScreen {
     private void orderCreation() {
         System.out.println("\nYour order has been finalized: ");
 
+        int pizzasOrdered = 0;
         System.out.print("Pizzas: ");
         for (int choice : choices) {
-            if (choice < pizzas.size()) System.out.print(itemsByNumber.get(choice) + ", ");
+            if (choice < pizzas.size()) {
+                System.out.print(itemsByNumber.get(choice) + ", ");
+                pizzasOrdered++;
+            }
         }
 
         System.out.print("\nDrinks: ");
@@ -59,11 +68,46 @@ public class IntroScreen {
                 System.out.print(itemsByNumber.get(choice) + ", ");
         }
 
-        System.out.println("\nTotal price: " + totalPrice);
+        DecimalFormat df = new DecimalFormat("#.##");
+        System.out.println("\nTotal price: " + df.format(totalPrice));
+
+        //discount voucher
+        if (discountVoucher(cust, pizzasOrdered)) {
+            System.out.println("You are eligible for a discount!");
+            System.out.println("Discounted price: " + df.format(totalPrice*0.90));
+        }
+        else {
+            System.out.println("You are not yet eligible for a discount, order " + (10-cust.getOrderHistory()) + " more pizza(s) for a voucher");
+        }
 
         order = new Order(cust.getCustomerId(), "Processing");
-        OrderDataMapper orderDataMapper = new OrderDataMapper(con);
         orderDataMapper.insert(order);
+    }
+
+    private boolean discountVoucher(Customer c, int pizzasOrdered) {
+        int orderCount = 0;
+        boolean voucherAvailable;
+        try {
+            PreparedStatement stmt = con.prepareStatement("SELECT order_history FROM customer WHERE customer_id = ?");
+            stmt.setInt(1, c.getCustomerId());
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next())
+                orderCount = rs.getInt(1);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        if (orderCount >= 10) {
+            voucherAvailable = true;
+            c.setOrderHistory(orderCount-10+pizzasOrdered);
+            customerMapper.update(c);
+        }
+        else {
+            voucherAvailable = false;
+            c.setOrderHistory(orderCount+pizzasOrdered);
+            customerMapper.update(c);
+        }
+
+        return voucherAvailable;
     }
 
     private void customerInfo() {
@@ -88,8 +132,6 @@ public class IntroScreen {
         }
 
         // try to find customer
-        CustomerDataMapper customerMapper = new CustomerDataMapper(con);
-        AddressDataMapper addressMapper = new AddressDataMapper(con);
 
         Optional<Customer> opt = customerMapper.find(firstName, lastName);
         Address address = null;
