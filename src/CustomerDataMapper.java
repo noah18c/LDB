@@ -19,7 +19,7 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
             pstmt.setString(2, lastName);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                s = new Customer(rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5));
+                s = new Customer(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5));
             }
         } catch (SQLException ex){
             // handle any errors
@@ -38,6 +38,13 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error in customer insertion");
+        }
+        try {
+            PreparedStatement keystmt = con.prepareStatement("SELECT SCOPE_IDENITY()");
+            ResultSet rs = keystmt.executeQuery();
+            customer.setCustomerId(rs.getInt(1));
+        } catch (SQLException e) {
+            System.out.println("Error in PK finding");
         }
     }
 }

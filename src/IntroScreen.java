@@ -13,6 +13,19 @@ public class IntroScreen {
     public ArrayList<String> drinks = new ArrayList<>();
     public ArrayList<String> desserts = new ArrayList<>();
 
+    ArrayList<String> pizzaPrices;
+    ArrayList<String> drinkPrices;
+    ArrayList<String> dessertPrices;
+
+    ArrayList<Integer> choices;
+    float totalPrice;
+
+    Customer cust;
+    Order order;
+
+    HashMap<Integer, String> itemsByNumber;
+    HashMap<Integer, String> pricesByNumber;
+
     public IntroScreen(Connection con){
         this.con = con;
     }
@@ -20,18 +33,41 @@ public class IntroScreen {
 
     public void run() {
         welcomeMessage();
-        //printMenu();
-       // choices();
+        printMenu();
+        choices();
         customerInfo();
         orderCreation();
     }
 
     private void orderCreation() {
+        System.out.println("\nYour order has been finalized: ");
 
+        System.out.print("Pizzas: ");
+        for (int choice : choices) {
+            if (choice < pizzas.size()) System.out.print(itemsByNumber.get(choice) + ", ");
+        }
+
+        System.out.print("\nDrinks: ");
+        for (int choice : choices) {
+            if (choice >= pizzas.size() && choice < drinks.size() + pizzas.size())
+                System.out.print(itemsByNumber.get(choice) + ", ");
+        }
+
+        System.out.print("\nDesserts: ");
+        for (int choice : choices) {
+            if (choice >= drinks.size() + pizzas.size())
+                System.out.print(itemsByNumber.get(choice) + ", ");
+        }
+
+        System.out.println("\nTotal price: " + totalPrice);
+
+        order = new Order(cust.getCustomerId(), "Processing");
+        OrderDataMapper orderDataMapper = new OrderDataMapper(con);
+        orderDataMapper.insert(order);
     }
 
     private void customerInfo() {
-        System.out.println("Please enter customer details: ");
+        System.out.println("\n\nPlease enter customer details: ");
         String firstName, lastName, streetName, postalCode;
         int phoneNumber, houseNumber;
 
@@ -47,7 +83,6 @@ public class IntroScreen {
         AddressDataMapper addressMapper = new AddressDataMapper(con);
 
         Optional<Customer> opt = customerMapper.find(firstName, lastName);
-        Customer cust;
         Address address = null;
 
         if (opt.isPresent()) {
@@ -84,21 +119,27 @@ public class IntroScreen {
     }
 
     private void choices() {
-        HashMap<Integer, String> itemsByNumber = new HashMap<>();
+        itemsByNumber = new HashMap<>();
+        pricesByNumber = new HashMap<>();
+
         int counter = 1;
         for (int i = 0; i< pizzas.size(); i++) {
+            pricesByNumber.put(counter, pizzaPrices.get(i));
             itemsByNumber.put(counter++, pizzas.get(i));
         }
         for (int i = 0; i< drinks.size(); i++) {
+            pricesByNumber.put(counter, drinkPrices.get(i));
             itemsByNumber.put(counter++, drinks.get(i));
         }
         for (int i = 0; i< desserts.size(); i++) {
+            pricesByNumber.put(counter, dessertPrices.get(i));
             itemsByNumber.put(counter++, desserts.get(i));
         }
 
         System.out.println("\nPlease make your choice (1, 2, ...), to stop press any other key");
         Scanner s = new Scanner(System.in);
-        ArrayList<Integer> choices = new ArrayList<>();
+
+        choices = new ArrayList<>();
 
         System.out.print("Please choose atleast one pizza first: ");
         while(s.hasNextInt()){
@@ -124,6 +165,7 @@ public class IntroScreen {
 
         System.out.print("\nYour order: ");
         for (int choice : choices) {
+            totalPrice += Float.parseFloat(pricesByNumber.get(choice));
             System.out.print(itemsByNumber.get(choice) + ", ");
         }
     }
@@ -134,9 +176,9 @@ public class IntroScreen {
         String query2 = "SELECT drink_name, drink_price FROM drink";
         String query3 = "SELECT dessert_name, dessert_price FROM dessert";
 
-        ArrayList<String> pizzaPrices = new ArrayList<>();
-        ArrayList<String> drinkPrices = new ArrayList<>();
-        ArrayList<String> dessertPrices = new ArrayList<>();
+        pizzaPrices = new ArrayList<>();
+        drinkPrices = new ArrayList<>();
+        dessertPrices = new ArrayList<>();
 
 
         ResultSet rs1, rs2, rs3;
