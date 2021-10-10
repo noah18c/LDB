@@ -18,12 +18,15 @@ public class IntroScreen {
     OrderDataMapper orderDataMapper;
     CustomerDataMapper customerMapper;
     AddressDataMapper addressMapper;
+    DeliveryPersonMapper deliveryPersonMapper;
 
     ArrayList<Integer> choices;
     float totalPrice;
 
     Customer cust;
     Order order;
+    Delivery delivery;
+    DeliveryPerson deliveryPerson;
 
     HashMap<Integer, String> itemsByNumber;
     HashMap<Integer, String> pricesByNumber;
@@ -82,6 +85,7 @@ public class IntroScreen {
 
         order = new Order(cust.getCustomerId(), "Processing");
         orderDataMapper.insert(order);
+
     }
 
     private boolean discountVoucher(Customer c, int pizzasOrdered) {
@@ -160,7 +164,7 @@ public class IntroScreen {
                     System.out.println("Please use only positive integers");
                 }
                 if(phoneNumber<=600000000){
-                    System.out.println("Please select a proper phone number");
+                    System.out.println("Please select a proper phone number, like 0612345678");
                 }
             }
 

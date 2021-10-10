@@ -10,7 +10,6 @@ public class OrderDataMapper {
 
     public OrderDataMapper(Connection con){
         this.con = con;
-
     }
 
     public Optional<Order> find(int orderId) {
