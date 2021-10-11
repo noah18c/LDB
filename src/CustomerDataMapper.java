@@ -40,7 +40,7 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
             System.out.println("Error in customer insertion");
         }
         try {
-            PreparedStatement keystmt = con.prepareStatement("SELECT SCOPE_IDENITY();");
+            PreparedStatement keystmt = con.prepareStatement("SELECT LAST_INSERT_ID();");
             ResultSet rs = keystmt.executeQuery();
             customer.setCustomerId(rs.getInt(1));
         } catch (SQLException e) {

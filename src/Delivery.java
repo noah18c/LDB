@@ -32,11 +32,12 @@ public class Delivery {
         setDeliveryPersonUnavailable();
     }
 
-    public Delivery(DeliveryPerson deliveryPerson, Timestamp deliveryTime, DeliveryDataMapper deliveryDataMapper){
+    public Delivery(DeliveryPerson deliveryPerson, Timestamp deliveryTime, DeliveryDataMapper deliveryDataMapper, DeliveryPersonMapper deliveryPersonMapper){
         this.deliveryDataMapper = deliveryDataMapper;
         this.deliveryPerson = deliveryPerson;
         this.deliveryPersonId = deliveryPerson.getDeliveryPersonId();
         this.deliveryTime = deliveryTime;
+        this.deliveryPersonMapper = deliveryPersonMapper;
         out = false;
         del = this;
 
@@ -92,6 +93,6 @@ public class Delivery {
                 deliveryPersonMapper.update(deliveryPerson);
             }
         };
-        scheduler.schedule(personUnavailable, 5, TimeUnit.MINUTES);
+        scheduler.schedule(personUnavailable, 30, TimeUnit.MINUTES);
     }
 }

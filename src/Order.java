@@ -2,6 +2,10 @@ public class Order {
     int orderId, customerId, deliveryId;
     String status;
 
+
+
+    Long orderDate;
+
     public Order(int orderId, int customerId, String status) {
         this.orderId = orderId;
         this.customerId = customerId;
@@ -11,6 +15,14 @@ public class Order {
     public Order(int customerId, String status) {
         this.customerId = customerId;
         this.status = status;
+    }
+
+    public Long getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Long orderDate) {
+        this.orderDate = orderDate;
     }
 
     public int getOrderId() {
