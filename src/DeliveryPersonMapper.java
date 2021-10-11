@@ -9,17 +9,17 @@ public class DeliveryPersonMapper {
         this.con = con;
     }
 
-    public Optional<DeliveryPerson> find(String firstName) {
+    public Optional<DeliveryPerson> find(String postalCode) {
         DeliveryPerson dp = null;
         try {
-            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM delivery_person WHERE delivery_person_first_name=?");
-            pstmt.setString(1, firstName);
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM delivery_person WHERE postal_code=? LIMIT 1");
+            pstmt.setString(1, postalCode);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                dp = new DeliveryPerson(rs.getInt(1), rs.getString(2), rs.getString(3));
+                dp = new DeliveryPerson(rs.getInt(1), rs.getString(2));
             }
         } catch (SQLException ex){
-            // handle any errors
+            System.out.println(ex.getMessage());
         }
         return Optional.ofNullable(dp);
     }
@@ -31,7 +31,7 @@ public class DeliveryPersonMapper {
             pstmt.setInt(1, deliveryPersonId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                dp = new DeliveryPerson(rs.getInt(1), rs.getString(2), rs.getString(3));
+                dp = new DeliveryPerson(rs.getInt(1), rs.getString(2));
             }
         } catch (SQLException ex){
             // handle any errors

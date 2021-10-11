@@ -2,20 +2,18 @@ import java.sql.Timestamp;
 
 public class Delivery {
 
-    private int deliveryId, deliveryPersonId, addressId;
+    private int deliveryId, deliveryPersonId;
     private Timestamp deliveryTime;
 
     public Delivery(int deliveryId, int deliveryPersonId, Timestamp deliveryTime, int addressId){
         this.deliveryId = deliveryId;
         this.deliveryPersonId = deliveryPersonId;
         this.deliveryTime = deliveryTime;
-        this.addressId = addressId;
     }
 
-    public Delivery(int deliveryPersonId, Timestamp deliveryTime, int addressId){
+    public Delivery(int deliveryPersonId, Timestamp deliveryTime){
         this.deliveryPersonId = deliveryPersonId;
         this.deliveryTime = deliveryTime;
-        this.addressId = addressId;
     }
 
     public int getDeliveryId() {
@@ -32,14 +30,6 @@ public class Delivery {
 
     public void setDeliveryPersonId(int deliveryPersonId) {
         this.deliveryPersonId = deliveryPersonId;
-    }
-
-    public int getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
     }
 
     public Timestamp getDeliveryTime() {

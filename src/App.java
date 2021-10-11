@@ -9,9 +9,7 @@ public class App {
     public static void main(String[] args) throws SQLException{
         String url = "jdbc:mysql://localhost:3306/ldb";
         String user = "root";
-        String password = "Aftershave1808";
-
-
+        String password = "PASSWORD";
 
 
         try {
@@ -33,34 +31,11 @@ public class App {
         }
 
         IntroScreen intro = new IntroScreen(con);
-        intro.run();
-
-
-
-
-
-        /*
-        String query = "SELECT * FROM pizza";
-        ResultSet rs = null;
-
-
-        try (Statement stmt = con.createStatement()) {
-            rs = stmt.executeQuery(query);
-            while(rs.next()){
-                System.out.println(rs.getString("pizza_name"));
-            }
-        } catch (SQLException e){
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
-        } finally {
-            if(rs != null){
-
-            }
+        try {
+            intro.run();
+        } catch(InterruptedException e) {
+            System.out.println("Interrupted");
         }
-        */
-
-
 
     }
 }

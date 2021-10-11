@@ -30,7 +30,7 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
     @Override
     public void insert(Customer customer) {
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO customer (first_name, last_name, phone_number, address_id, order_history) values (?, ?, ?, ?, 0)");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO customer (first_name, last_name, phone_number, address_id, order_history) values (?, ?, ?, ?, 0);");
             stmt.setString(1, customer.getFirstName());
             stmt.setString(2, customer.getLastName());
             stmt.setInt(3, customer.getPhoneNumber());
@@ -40,7 +40,7 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
             System.out.println("Error in customer insertion");
         }
         try {
-            PreparedStatement keystmt = con.prepareStatement("SELECT SCOPE_IDENITY()");
+            PreparedStatement keystmt = con.prepareStatement("SELECT SCOPE_IDENITY();");
             ResultSet rs = keystmt.executeQuery();
             customer.setCustomerId(rs.getInt(1));
         } catch (SQLException e) {

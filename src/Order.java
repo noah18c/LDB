@@ -1,5 +1,5 @@
 public class Order {
-    int orderId, customerId;
+    int orderId, customerId, deliveryId;
     String status;
 
     public Order(int orderId, int customerId, String status) {
@@ -27,6 +27,14 @@ public class Order {
 
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
+    }
+
+    public int getDeliveryId() {
+        return deliveryId;
+    }
+
+    public void setDeliveryId(int deliveryId) {
+        this.deliveryId = deliveryId;
     }
 
     public String getStatus() {

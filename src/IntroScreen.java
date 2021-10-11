@@ -1,9 +1,13 @@
 import java.sql.*;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+import java.time.LocalDate;
 
 public class IntroScreen {
     private Connection con;
@@ -18,6 +22,7 @@ public class IntroScreen {
     OrderDataMapper orderDataMapper;
     CustomerDataMapper customerMapper;
     AddressDataMapper addressMapper;
+    DeliveryDataMapper deliveryDataMapper;
     DeliveryPersonMapper deliveryPersonMapper;
 
     ArrayList<Integer> choices;
@@ -25,26 +30,64 @@ public class IntroScreen {
 
     Customer cust;
     Order order;
+    Address address;
     Delivery delivery;
     DeliveryPerson deliveryPerson;
 
     HashMap<Integer, String> itemsByNumber;
     HashMap<Integer, String> pricesByNumber;
 
+    DateTimeFormatter dtf;
+
     public IntroScreen(Connection con){
         this.con = con;
         orderDataMapper = new OrderDataMapper(con);
         customerMapper = new CustomerDataMapper(con);
         addressMapper = new AddressDataMapper(con);
+        deliveryDataMapper = new DeliveryDataMapper(con);
+        deliveryPersonMapper = new DeliveryPersonMapper(con);
+
+        dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     }
 
 
-    public void run() {
+    public void run() throws InterruptedException {
         welcomeMessage();
+        TimeUnit.SECONDS.sleep(2);
         printMenu();
+        TimeUnit.SECONDS.sleep(2);
         choices();
         customerInfo();
+        TimeUnit.SECONDS.sleep(3);
         orderCreation();
+        deliveryCreation();
+    }
+
+    private void deliveryCreation() {
+        // Check if there exists a delivery with time created < 5 minutes ago with the same postal code
+        // if so, add the order to that delivery
+//        deliveryDataMapper.findMatchingDelivery(address.getPostalCode());
+
+        //if not:
+        // find a delivery person with the corresponding postal code
+        DeliveryPerson dp = null;
+        Optional<DeliveryPerson> optdp = deliveryPersonMapper.find(address.getPostalCode());
+        if (optdp.isPresent()) {
+            dp = optdp.get();
+            System.out.println("Delivery person assigned: " + dp.getDeliveryPersonId());
+        }
+        else
+            System.out.println("No delivery persons in that area");
+        //Create a new delivery, add that deliveryID to the order
+
+        Long datetime = System.currentTimeMillis();
+        Timestamp timestamp = new Timestamp(datetime);
+
+        Delivery delivery = new Delivery(dp.getDeliveryPersonId(), timestamp);
+        deliveryDataMapper.insert(delivery);
+        order.setDeliveryId(delivery.getDeliveryId());
+        // set a 5-minute timer, then have the delivery go out
+        // Set the delivery guy to unavailable for 30 minutes
     }
 
     private void orderCreation() {
@@ -72,12 +115,15 @@ public class IntroScreen {
         }
 
         DecimalFormat df = new DecimalFormat("#.##");
-        System.out.println("\nTotal price: " + df.format(totalPrice));
+        System.out.println("\n\nTotal price: " + df.format(totalPrice));
 
         //discount voucher
         if (discountVoucher(cust, pizzasOrdered)) {
             System.out.println("You are eligible for a discount!");
             System.out.println("Discounted price: " + df.format(totalPrice*0.90));
+        }
+        else if(cust.getOrderHistory() >= 10) {
+            System.out.println("You will be eligible for a discount on your next order!");
         }
         else {
             System.out.println("You are not yet eligible for a discount, order " + (10-cust.getOrderHistory()) + " more pizza(s) for a voucher");
@@ -85,7 +131,6 @@ public class IntroScreen {
 
         order = new Order(cust.getCustomerId(), "Processing");
         orderDataMapper.insert(order);
-
     }
 
     private boolean discountVoucher(Customer c, int pizzasOrdered) {
@@ -138,7 +183,7 @@ public class IntroScreen {
         // try to find customer
 
         Optional<Customer> opt = customerMapper.find(firstName, lastName);
-        Address address = null;
+        address = null;
 
         if (opt.isPresent()) {
             System.out.println("We found your details in the system:");
@@ -273,25 +318,26 @@ public class IntroScreen {
         ResultSet rs1, rs2, rs3;
 
         try(Statement stmt = con.createStatement()){
-            rs1 = stmt.executeQuery(query1);
-            while(rs1.next()){
-                pizzas.add(rs1.getString("pizza_name"));
-                pizzaPrices.add(rs1.getString("pizza_price"));
+            if (pizzas.isEmpty()) {
+                rs1 = stmt.executeQuery(query1);
+                while (rs1.next()) {
+                    pizzas.add(rs1.getString("pizza_name"));
+                    pizzaPrices.add(rs1.getString("pizza_price"));
 
+                }
+
+                rs2 = stmt.executeQuery(query2);
+                while (rs2.next()) {
+                    drinks.add(rs2.getString("drink_name"));
+                    drinkPrices.add(rs2.getString("drink_price"));
+                }
+
+                rs3 = stmt.executeQuery(query3);
+                while (rs3.next()) {
+                    desserts.add(rs3.getString("dessert_name"));
+                    dessertPrices.add(rs3.getString("dessert_price"));
+                }
             }
-
-            rs2 = stmt.executeQuery(query2);
-            while(rs2.next()){
-                drinks.add(rs2.getString("drink_name"));
-                drinkPrices.add(rs2.getString("drink_price"));
-            }
-
-            rs3 = stmt.executeQuery(query3);
-            while(rs3.next()){
-                desserts.add(rs3.getString("dessert_name"));
-                dessertPrices.add(rs3.getString("dessert_price"));
-            }
-
             int counter = 1;
 
             System.out.println("");

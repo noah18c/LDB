@@ -15,7 +15,7 @@ public class OrderDataMapper {
     public Optional<Order> find(int orderId) {
         Order s = null;
         try {
-            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM order WHERE order_id=?;");
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM orders WHERE order_id=?;");
             pstmt.setInt(1, orderId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -29,20 +29,23 @@ public class OrderDataMapper {
 
     public void insert(Order order) {
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO order (customerId, status) values (?, ?)");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO orders (customer_id, order_status) values (?, ?);");
             stmt.setInt(1, order.getCustomerId());
             stmt.setString(2, order.getStatus());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error in order insertion");
+            System.out.println(e.getMessage());
         }
 
         try {
-            PreparedStatement keystmt = con.prepareStatement("SELECT SCOPE_IDENITY()");
+            PreparedStatement keystmt = con.prepareStatement("SELECT LAST_INSERT_ID();");
             ResultSet rs = keystmt.executeQuery();
-            order.setOrderId(rs.getInt(1));
+            while (rs.next())
+                order.setOrderId(rs.getInt(1));
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             System.out.println("Error in PK finding");
         }
     }
