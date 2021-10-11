@@ -11,8 +11,10 @@ import java.time.format.DateTimeFormatter;
 
 public class DeliveryDataMapper {
     private Connection con;
+    private DeliveryPersonMapper deliveryPersonMapper;
 
     public DeliveryDataMapper(Connection con){
+        deliveryPersonMapper = new DeliveryPersonMapper(con);
         this.con = con;
     }
 
@@ -22,18 +24,25 @@ public class DeliveryDataMapper {
      * @return delivery if found
      */
     public Optional<Delivery> findMatchingDelivery(String postalCode) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-        LocalDateTime currTime = LocalDateTime.now();
-        System.out.println(currTime);
-//        try {
-//            PreparedStatement stmt = con.prepareStatement("SELECT delivery_id FROM delivery WHERE ")
-//        }
-        return null;
+        Delivery d = null;
+        try {
+            PreparedStatement stmt = con.prepareStatement("SELECT * FROM delivery WHERE left_shop = ? AND delivery_person_id = (SELECT delivery_person_id FROM delivery_person WHERE postal_code = ?) LIMIT 1;");
+            stmt.setString(2, postalCode);
+            stmt.setBoolean(1, false);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                DeliveryPerson dp = deliveryPersonMapper.find(rs.getInt(2)).get();
+                d = new Delivery(rs.getInt(1), dp, rs.getTimestamp(3), this, new DeliveryPersonMapper(con));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return Optional.ofNullable(d);
     }
 
     public void insert(Delivery delivery) {
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO delivery (delivery_person_id, delivery_time) values (?, ?)");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO delivery (delivery_person_id, delivery_time, left_shop) values (?, ?, false)");
             stmt.setInt(1, delivery.getDeliveryPersonId());
             stmt.setTimestamp(2, delivery.getDeliveryTime());
             stmt.executeUpdate();
@@ -48,6 +57,17 @@ public class DeliveryDataMapper {
                 delivery.setDeliveryId(rs.getInt(1));
         } catch (SQLException e) {
             System.out.println("Error in PK finding for delivery");
+        }
+    }
+
+    public void update(Delivery deliveryToBeUpdated) {
+        try {
+            PreparedStatement pstmt = con.prepareStatement("UPDATE delivery SET out = ? WHERE delivery_id = ?;");
+            pstmt.setBoolean(1, deliveryToBeUpdated.getOut());
+            pstmt.setInt(2, deliveryToBeUpdated.getDeliveryId());
+            pstmt.executeUpdate();
+        } catch (SQLException ex){
+            System.out.println("Customer update failed");
         }
     }
 

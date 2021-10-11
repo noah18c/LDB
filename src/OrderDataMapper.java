@@ -49,4 +49,18 @@ public class OrderDataMapper {
             System.out.println("Error in PK finding");
         }
     }
+
+    public void update(Order orderToBeUpdated) {
+        try {
+            PreparedStatement pstmt = con.prepareStatement("UPDATE orders SET customer_id = ?, order_status = ?, delivery_id = ? WHERE orders_id = ?;");
+            pstmt.setInt(1, orderToBeUpdated.getCustomerId());
+            pstmt.setString(2, orderToBeUpdated.getStatus());
+            pstmt.setInt(3, orderToBeUpdated.getDeliveryId());
+            pstmt.setInt(4, orderToBeUpdated.getOrderId());
+            pstmt.executeUpdate();
+        } catch (SQLException ex){
+            System.out.println(ex.getMessage());
+            System.out.println("Order update failed");
+        }
+    }
 }

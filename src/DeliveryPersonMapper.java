@@ -39,4 +39,15 @@ public class DeliveryPersonMapper {
         return Optional.ofNullable(dp);
     }
 
+    public void update(DeliveryPerson deliveryPersonToBeUpdated) {
+        try {
+            PreparedStatement pstmt = con.prepareStatement("UPDATE delivery_person SET postal_code = ?, available = ? WHERE delivery_id = ?;");
+            pstmt.setString(1, deliveryPersonToBeUpdated.getPostalCode());
+            pstmt.setBoolean(2, deliveryPersonToBeUpdated.isAvailable());
+            pstmt.executeUpdate();
+        } catch (SQLException ex){
+            System.out.println("deliveryPerson update failed");
+        }
+    }
+
 }

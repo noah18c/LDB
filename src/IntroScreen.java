@@ -66,28 +66,32 @@ public class IntroScreen {
     private void deliveryCreation() {
         // Check if there exists a delivery with time created < 5 minutes ago with the same postal code
         // if so, add the order to that delivery
-//        deliveryDataMapper.findMatchingDelivery(address.getPostalCode());
-
-        //if not:
-        // find a delivery person with the corresponding postal code
         DeliveryPerson dp = null;
-        Optional<DeliveryPerson> optdp = deliveryPersonMapper.find(address.getPostalCode());
-        if (optdp.isPresent()) {
-            dp = optdp.get();
-            System.out.println("Delivery person assigned: " + dp.getDeliveryPersonId());
+        Optional<Delivery> existingDel = deliveryDataMapper.findMatchingDelivery(address.getPostalCode());
+        if (existingDel.isPresent()) {
+            System.out.println("Found existing delivery!");
+            order.setDeliveryId(existingDel.get().getDeliveryId());
         }
-        else
-            System.out.println("No delivery persons in that area");
-        //Create a new delivery, add that deliveryID to the order
+        else {
+            System.out.println("No matching existing delivery, creating new");
 
-        Long datetime = System.currentTimeMillis();
-        Timestamp timestamp = new Timestamp(datetime);
+            Optional<DeliveryPerson> optdp = deliveryPersonMapper.find(address.getPostalCode());
+            if (optdp.isPresent()) {
+                dp = optdp.get();
+                System.out.println("Delivery person assigned: " + dp.getDeliveryPersonId());
+            }
+            else
+                System.out.println("No delivery persons in that area");
 
-        Delivery delivery = new Delivery(dp.getDeliveryPersonId(), timestamp);
-        deliveryDataMapper.insert(delivery);
-        order.setDeliveryId(delivery.getDeliveryId());
-        // set a 5-minute timer, then have the delivery go out
-        // Set the delivery guy to unavailable for 30 minutes
+            Long datetime = System.currentTimeMillis();
+            Timestamp timestamp = new Timestamp(datetime);
+
+            Delivery delivery = new Delivery(dp, timestamp, deliveryDataMapper);
+            deliveryDataMapper.insert(delivery);
+            order.setDeliveryId(delivery.getDeliveryId());
+        }
+        orderDataMapper.update(order);
+        System.out.println("Order updated successfully and assigned to a delivery");
     }
 
     private void orderCreation() {
@@ -197,7 +201,6 @@ public class IntroScreen {
             System.out.println("Postal code: " + address.getPostalCode());
         }
         else {
-
             phoneNumber = 0;
             while(phoneNumber <= 600000000){
                 System.out.print("Phone Number: ");
