@@ -62,12 +62,12 @@ public class DeliveryDataMapper {
 
     public void update(Delivery deliveryToBeUpdated) {
         try {
-            PreparedStatement pstmt = con.prepareStatement("UPDATE delivery SET out = ? WHERE delivery_id = ?;");
+            PreparedStatement pstmt = con.prepareStatement("UPDATE delivery SET left_shop = ? WHERE delivery_id = ?;");
             pstmt.setBoolean(1, deliveryToBeUpdated.getOut());
             pstmt.setInt(2, deliveryToBeUpdated.getDeliveryId());
             pstmt.executeUpdate();
         } catch (SQLException ex){
-            System.out.println("Customer update failed");
+            System.out.println("Delivery update failed");
         }
     }
 

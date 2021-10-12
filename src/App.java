@@ -9,7 +9,7 @@ public class App {
     public static void main(String[] args) throws SQLException{
         String url = "jdbc:mysql://localhost:3306/ldb";
         String user = "root";
-        String password = "Aftershave1808";
+        String password = "Saradomin@1";
 
 
         try {

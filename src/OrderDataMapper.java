@@ -15,24 +15,25 @@ public class OrderDataMapper {
     public Optional<Order> find(int orderId) {
         Order s = null;
         try {
-            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM orders WHERE order_id=?;");
+            PreparedStatement pstmt = con.prepareStatement("SELECT * FROM orders WHERE orders_id=?;");
             pstmt.setInt(1, orderId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                s = new Order(rs.getInt(1), rs.getInt(2), rs.getString(3));
+                s = new Order(rs.getInt(1), rs.getInt(2), rs.getString(3), rs.getTimestamp(5));
             }
         } catch (SQLException ex){
-            System.out.println("Error in finding address");
+            System.out.println(ex.getMessage());
+            System.out.println("Error in finding order");
         }
         return Optional.ofNullable(s);
     }
 
     public void insert(Order order) {
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO orders (customer_id, order_status) values (?, ?);");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO orders (customer_id, order_status, orderDate) values (?, ?, ?);");
             stmt.setInt(1, order.getCustomerId());
             stmt.setString(2, order.getStatus());
-
+            stmt.setTimestamp(3, order.getOrderDate());
             stmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error in order insertion");
@@ -52,11 +53,9 @@ public class OrderDataMapper {
 
     public void update(Order orderToBeUpdated) {
         try {
-            PreparedStatement pstmt = con.prepareStatement("UPDATE orders SET customer_id = ?, order_status = ?, delivery_id = ? WHERE orders_id = ?;");
-            pstmt.setInt(1, orderToBeUpdated.getCustomerId());
-            pstmt.setString(2, orderToBeUpdated.getStatus());
-            pstmt.setInt(3, orderToBeUpdated.getDeliveryId());
-            pstmt.setInt(4, orderToBeUpdated.getOrderId());
+            PreparedStatement pstmt = con.prepareStatement("UPDATE orders SET order_status = ? WHERE orders_id = ?;");
+            pstmt.setString(1, orderToBeUpdated.getStatus());
+            pstmt.setInt(2, orderToBeUpdated.getOrderId());
             pstmt.executeUpdate();
         } catch (SQLException ex){
             System.out.println(ex.getMessage());

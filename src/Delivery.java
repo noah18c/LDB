@@ -34,6 +34,7 @@ public class Delivery {
 
     public Delivery(DeliveryPerson deliveryPerson, Timestamp deliveryTime, DeliveryDataMapper deliveryDataMapper, DeliveryPersonMapper deliveryPersonMapper){
         this.deliveryDataMapper = deliveryDataMapper;
+        this.deliveryPersonMapper = deliveryPersonMapper;
         this.deliveryPerson = deliveryPerson;
         this.deliveryPersonId = deliveryPerson.getDeliveryPersonId();
         this.deliveryTime = deliveryTime;

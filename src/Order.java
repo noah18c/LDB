@@ -1,27 +1,28 @@
+import java.sql.Timestamp;
+
 public class Order {
     int orderId, customerId, deliveryId;
     String status;
+    Timestamp orderDate;
 
-
-
-    Long orderDate;
-
-    public Order(int orderId, int customerId, String status) {
+    public Order(int orderId, int customerId, String status, Timestamp orderDate) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.status = status;
+        this.orderDate = orderDate;
     }
 
-    public Order(int customerId, String status) {
+    public Order(int customerId, String status, Timestamp orderDate) {
         this.customerId = customerId;
         this.status = status;
+        this.orderDate = orderDate;
     }
 
-    public Long getOrderDate() {
+    public Timestamp getOrderDate() {
         return orderDate;
     }
 
-    public void setOrderDate(Long orderDate) {
+    public void setOrderDate(Timestamp orderDate) {
         this.orderDate = orderDate;
     }
 

@@ -28,7 +28,7 @@ public class AddressDataMapper {
     public int insert(Address address) {
         int id = 0;
         try {
-            PreparedStatement stmt = con.prepareStatement("INSERT INTO address (postal_code, street_name, house_number) values (?, ?, ?1);");
+            PreparedStatement stmt = con.prepareStatement("INSERT INTO address (postal_code, street_name, street_number, street_number_char) values (?, ?, ?, ?);");
             stmt.setString(1, address.getPostalCode());
             stmt.setString(2, address.getStreetName());
             stmt.setInt(3, address.getHouseNumber());
