@@ -129,6 +129,8 @@ public class IntroScreen {
             Optional<DeliveryPerson> optdp = deliveryPersonMapper.find(address.getPostalCode());
             if (optdp.isPresent()) {
                 dp = optdp.get();
+                dp.setAvailable(false);
+                deliveryPersonMapper.update(dp);
                 System.out.println("Delivery person assigned: " + dp.getDeliveryPersonId());
             }
             else
@@ -170,7 +172,7 @@ public class IntroScreen {
         }
 
         DecimalFormat df = new DecimalFormat("#.##");
-        System.out.println("\n\nTotal price: " + df.format(totalPrice));
+        System.out.println("\n\nTotal price: €" + df.format(totalPrice));
 
         //discount voucher
         if (discountVoucher(cust, pizzasOrdered)) {
@@ -405,21 +407,21 @@ public class IntroScreen {
             System.out.println("");
             for(int i = 0; i < pizzas.size() ; i++){
                 if (veggiePizzas.contains(pizzas.get(i))) {
-                    System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i) + " | V");
+                    System.out.println(counter++ + " " + pizzas.get(i)+" | €"+pizzaPrices.get(i) + " | V");
                 }
                 else {
-                    System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i));
+                    System.out.println(counter++ + " " + pizzas.get(i)+" | €"+pizzaPrices.get(i));
                 }
             }
 
             System.out.println("");
             for(int i = 0; i < drinks.size() ; i++){
-                System.out.println(counter++ + " " + drinks.get(i)+" | "+drinkPrices.get(i));
+                System.out.println(counter++ + " " + drinks.get(i)+" | €"+drinkPrices.get(i));
             }
 
             System.out.println("");
             for(int i = 0; i < desserts.size() ; i++){
-                System.out.println(counter++ + " " + desserts.get(i)+" | "+dessertPrices.get(i));
+                System.out.println(counter++ + " " + desserts.get(i)+" | €"+dessertPrices.get(i));
             }
 
 

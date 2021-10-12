@@ -53,9 +53,10 @@ public class OrderDataMapper {
 
     public void update(Order orderToBeUpdated) {
         try {
-            PreparedStatement pstmt = con.prepareStatement("UPDATE orders SET order_status = ? WHERE orders_id = ?;");
+            PreparedStatement pstmt = con.prepareStatement("UPDATE orders SET order_status = ?, delivery_id = ? WHERE orders_id = ?;");
             pstmt.setString(1, orderToBeUpdated.getStatus());
-            pstmt.setInt(2, orderToBeUpdated.getOrderId());
+            pstmt.setInt(2, orderToBeUpdated.getDeliveryId());
+            pstmt.setInt(3, orderToBeUpdated.getOrderId());
             pstmt.executeUpdate();
         } catch (SQLException ex){
             System.out.println(ex.getMessage());

@@ -42,7 +42,8 @@ public class CustomerDataMapper implements CustomerDataMapperInterface{
         try {
             PreparedStatement keystmt = con.prepareStatement("SELECT LAST_INSERT_ID();");
             ResultSet rs = keystmt.executeQuery();
-            customer.setCustomerId(rs.getInt(1));
+            if (rs.next())
+                customer.setCustomerId(rs.getInt(1));
         } catch (SQLException e) {
             System.out.println("Error in PK finding");
         }
