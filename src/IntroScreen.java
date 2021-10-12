@@ -55,19 +55,21 @@ public class IntroScreen {
 
     public void run() throws InterruptedException {
         welcomeMessage();
-//        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(2);
         printMenu();
-//        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(2);
         choices();
         customerInfo();
-//        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.SECONDS.sleep(3);
         orderCreation();
+        TimeUnit.SECONDS.sleep(2);
         deliveryCreation();
+        TimeUnit.SECONDS.sleep(2);
         requestAndCancel();
     }
 
     private void requestAndCancel() {
-        System.out.println("You can now request the status of your order, or cancel it (within 5 minutes)");
+        System.out.println("\nYou can now request the status of your order, or cancel it (within 5 minutes)");
         System.out.println("To request the status, type REQUEST");
         System.out.println("To cancel the order, type CANCEL");
         Scanner s = new Scanner(System.in);
@@ -100,6 +102,7 @@ public class IntroScreen {
                     order.setStatus("Cancelled");
                     orderDataMapper.update(order);
                     System.out.println("Your order has been cancelled");
+                    System.out.println("We hope to see you again!");
                     break;
                 }
             }
@@ -113,14 +116,15 @@ public class IntroScreen {
     private void deliveryCreation() {
         // Check if there exists a delivery with time created < 5 minutes ago with the same postal code
         // if so, add the order to that delivery
+        System.out.println("");
         DeliveryPerson dp = null;
         Optional<Delivery> existingDel = deliveryDataMapper.findMatchingDelivery(address.getPostalCode());
         if (existingDel.isPresent()) {
-            System.out.println("Found existing delivery!");
+            System.out.println("Found existing delivery, your order will be added to it!");
             order.setDeliveryId(existingDel.get().getDeliveryId());
         }
         else {
-            System.out.println("No matching existing delivery, creating new");
+            System.out.println("No matching existing delivery, creating new one!");
 
             Optional<DeliveryPerson> optdp = deliveryPersonMapper.find(address.getPostalCode());
             if (optdp.isPresent()) {
@@ -138,7 +142,7 @@ public class IntroScreen {
             order.setDeliveryId(delivery.getDeliveryId());
         }
         orderDataMapper.update(order);
-        System.out.println("Order updated successfully and assigned to a delivery");
+//        System.out.println("Order updated successfully and assigned to a delivery");
     }
 
     private void orderCreation() {
@@ -360,12 +364,15 @@ public class IntroScreen {
         String query1 = "SELECT pizza_name, pizza_price FROM pizza";
         String query2 = "SELECT drink_name, drink_price FROM drink";
         String query3 = "SELECT dessert_name, dessert_price FROM dessert";
+        String query4 = "SELECT pizza_name FROM pizza WHERE pizza_id NOT IN (SELECT pizza_id FROM pizza_topping WHERE topping_id IN (SELECT topping_id FROM topping WHERE topping_vegetarian = FALSE));";
 
         pizzaPrices = new ArrayList<>();
         drinkPrices = new ArrayList<>();
         dessertPrices = new ArrayList<>();
 
-        ResultSet rs1, rs2, rs3;
+        ArrayList<String> veggiePizzas = new ArrayList<>();
+
+        ResultSet rs1, rs2, rs3, rs4;
 
         try(Statement stmt = con.createStatement()){
             if (pizzas.isEmpty()) {
@@ -387,12 +394,22 @@ public class IntroScreen {
                     desserts.add(rs3.getString("dessert_name"));
                     dessertPrices.add(rs3.getString("dessert_price"));
                 }
+
+                rs4 = stmt.executeQuery(query4);
+                while (rs4.next()) {
+                    veggiePizzas.add(rs4.getString("pizza_name"));
+                }
             }
             int counter = 1;
 
             System.out.println("");
             for(int i = 0; i < pizzas.size() ; i++){
-                System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i));
+                if (veggiePizzas.contains(pizzas.get(i))) {
+                    System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i) + " | V");
+                }
+                else {
+                    System.out.println(counter++ + " " + pizzas.get(i)+" | "+pizzaPrices.get(i));
+                }
             }
 
             System.out.println("");
